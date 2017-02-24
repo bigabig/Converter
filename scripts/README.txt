@@ -1,0 +1,5 @@
+- pdftotext runterladen: ftp://ftp.foolabs.com/pub/xpdf/xpdfbin-win-3.04.zip
+- Pfad in den Scripts zu dem Ordner ändern, wo PDFs liegen
+- die Converter .jar Datei auch in den Ordner kopieren
+- möglicherweise den Namen der .jar im Script anpassen
+- Scripts ausführen mit PowerShell
