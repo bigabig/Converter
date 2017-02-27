@@ -31,10 +31,6 @@ public class ShortcutList {
             e.printStackTrace();
         }
 
-        for(String s : shortcuts) {
-            System.out.println(s);
-        }
-
     }
 
     public List<String> getShortcuts() {

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Created by tim on 21.02.2017.
  */
-public class Converter {
+public class Main {
 
     public static Replace[] replacements = {
 
@@ -61,7 +61,7 @@ public class Converter {
 
     public static void main(String[] args) {
 
-        List<String> shortcuts = (new ShortcutList("C:\\Users\\Bobby\\Desktop\\shortcuts.txt")).getShortcuts();
+        List<String> shortcuts = (new ShortcutList(System.getProperty("user.dir")+"\\shortcuts.txt")).getShortcuts();
 
         monate.put("Januar", 1);
         monate.put("Februar", 2);
