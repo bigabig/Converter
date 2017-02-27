@@ -5,7 +5,9 @@ import org.apache.commons.io.IOUtils;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,30 +18,38 @@ import java.util.regex.Pattern;
 public class Converter {
 
     public static Replace[] replacements = {
+
             new Replace(" a\\. ", " am "),
-            new Replace(" 1\\. ", " erste "),
-            new Replace(" 2\\. ", " zweite "),
-            new Replace(" 3\\. ", " dritte "),
-            new Replace(" 4\\. ", " vierte "),
-            new Replace(" 5\\. ", " fünfte "),
-            new Replace(" 6\\. ", " sechste "),
-            new Replace(" 7\\. ", " siebte "),
-            new Replace(" 8\\. ", " achte "),
-            new Replace(" 9\\. ", " neunte "),
-            new Replace("VIII\\.", "8"),
-            new Replace("VII\\.", "7"),
-            new Replace("III\\.", "3"),
-            new Replace("II\\.", "2"),
-            new Replace("IX\\.", "9"),
-            new Replace("VI\\.", "6"),
-            new Replace("IV\\.", "4"),
-            new Replace("V\\.", "5"),
-            new Replace("I\\.", "1"),
-            new Replace("X\\.", "10"),
-            new Replace("vgl\\. ", " vergleiche "),
+            new Replace(" 1\\. ", " 1_ "),
+            new Replace(" 2\\. ", " 2_ "),
+            new Replace(" 3\\. ", " 3_ "),
+            new Replace(" 4\\. ", " 4_ "),
+            new Replace(" 5\\. ", " 5_ "),
+            new Replace(" 6\\. ", " 6_ "),
+            new Replace(" 7\\. ", " 7_ "),
+            new Replace(" 8\\. ", " 8_ "),
+            new Replace(" 9\\. ", " 9_ "),
+            new Replace("i.V.m.", "in Verbindung mit" ),
+            new Replace("VIII\\.", "VIII_"),
+            new Replace("VII\\.", "VII_"),
+            new Replace("XII\\.", "XII_"),
+            new Replace("III\\.", "III_"),
+            new Replace("II\\." , "II_"),
+            new Replace("XI\\.", "XI_"),
+            new Replace("IX\\.", "IX_"),
+            new Replace("VI\\.", "VI_"),
+            new Replace("IV\\.", "IV_"),
+            new Replace("V\\.", "V_"),
+            new Replace("I\\.", "I_"),
+            new Replace("X\\. ", "10"),
+            new Replace(" vgl\\. ", " vergleiche "),
             new Replace(" Abs\\. ", " Absatz "),
             new Replace(" Art\\. ", " Artikel "),
             new Replace(" Nr\\. ", " Nummer "),
+            new Replace(" \\(vgl\\. ", " \\(vergleiche "),
+            new Replace(" \\(Abs\\. ", " \\(Absatz "),
+            new Replace(" \\(Art\\. ", " \\(Artikel "),
+            new Replace(" \\(Nr\\. ", " \\(Nummer "),
             new Replace("Prof\\.", "Professor"),
             new Replace("Dr\\.", "Doktor"),
             new Replace("bzw\\.", "beziehungsweise"),
@@ -50,6 +60,8 @@ public class Converter {
     public static Map<String, Integer> monate = new HashMap<String, Integer>();
 
     public static void main(String[] args) {
+
+        List<String> shortcuts = (new ShortcutList("C:\\Users\\Bobby\\Desktop\\shortcuts.txt")).getShortcuts();
 
         monate.put("Januar", 1);
         monate.put("Februar", 2);
@@ -75,13 +87,62 @@ public class Converter {
             FileInputStream fis = new FileInputStream(inFile);
             String content = IOUtils.toString(fis,"UTF-8");
 
-            // kompliziertere Ersetzungen mittels Regular Expressions:
+
+            // Leerzeichen
+            String pattern10 = "(^\\s\\s\\s)";
+
+            Pattern p = Pattern.compile(pattern10);
+            Matcher m = p.matcher(content);
+
+            while(m.find()) {
+
+                String original = m.group(1);
+                String neu = "";
+
+                content = content.replace(original, neu);
+
+
+            }
+
+
+
+            for(String s: shortcuts)
+            {
+                String original = s.replace(".", "\\.");
+
+                //System.out.println(original);
+                String replacement = s.replace(".", "_");
+
+
+                String zeilenanfang = "\n" + original + " ";
+                String zeilenanfangReplace = "\n" + replacement + " ";
+
+                String leerzeichen = "\\s"+original+"\\s";
+                String leerzeichenReplace = " "+replacement+" ";
+
+                String klammern = "\\("+original+" ";
+                String klammernReplace = "("+replacement+" " ;
+
+                String klammern2 = " " + original + "\\)" ;
+                String klammern2Replace = " " + replacement + ")" ;
+
+                String zeilenende = "\\s"+original+"\n";
+                String zeilenendeReplace = " "+ replacement + " ";
+
+
+                content = content.replaceAll(zeilenanfang, zeilenanfangReplace);
+                content = content.replaceAll(leerzeichen,leerzeichenReplace );
+                content = content.replaceAll(klammern, klammernReplace);
+                content = content.replaceAll(klammern2,klammern2Replace );
+                content = content.replaceAll(zeilenende,zeilenendeReplace );
+            }
+
 
             // Seitenzahlen
             String pattern3 = "(-\\s?\\d{1,2}\\s?-)";
 
-            Pattern p = Pattern.compile(pattern3);
-            Matcher m = p.matcher(content);
+            p = Pattern.compile(pattern3);
+            m = p.matcher(content);
 
             while(m.find()) {
 
@@ -93,10 +154,13 @@ public class Converter {
                 System.out.println("Seitenzahl: "+ original);
             }
 
-            // Datum: 12. Februar 2017 -> 12-2-2017
-            String pattern = "((\\d(\\d)?)\\.\\s([äÄöÖüÜßa-zA-Z]+)\\s(\\d{4}))";
 
-            p = Pattern.compile(pattern);
+
+
+            // Datum: 12. Februar 2017 -> 12-2-2017
+            String pattern = "((\\d(\\d)?)\\.\\s+?([äÄöÖüÜßa-zA-Z]+)\\s(\\d{4}))";
+
+            p = Pattern.compile(pattern,Pattern.MULTILINE | Pattern.CANON_EQ);
             m = p.matcher(content);
 
             while(m.find()) {
@@ -125,6 +189,9 @@ public class Converter {
                 System.out.println("DatumNeu: "+neu);
             }
 
+
+
+
             // Geldbeträge: 5.000,34 € -> 5000,34 €
             String pattern2 = "(\\s\\d{1,3}(\\.\\d{3})?(\\,\\d{1,2})?\\s?)€";
 
@@ -140,6 +207,9 @@ public class Converter {
 
                 System.out.println("Geldbetrag: "+ original);
             }
+
+
+
 
             // 30. -> 30
             String pattern4 = "(\\s\\d\\d+\\.\\s)";
@@ -157,15 +227,18 @@ public class Converter {
                 System.out.println("Zahl: "+ original);
             }
 
+
             // Einfache Ersetzungen mittels Replacement Array
             for(Replace r : replacements) {
                 content = content.replaceAll(r.from, r.to);
             }
 
+
+
             // Bindestriche
             String pattern5 = "([äÄöÖüÜßa-zA-Z]-[\\r?\\n]+[äÄöÖüÜßa-zA-Z])";
 
-            p = Pattern.compile(pattern5);
+            p = Pattern.compile(pattern5,Pattern.MULTILINE | Pattern.CANON_EQ);
             m = p.matcher(content);
 
             while(m.find()) {
@@ -180,24 +253,22 @@ public class Converter {
                 System.out.println("Wortunterbrechung: "+ original);
             }
 
-            // Satzumbruch
-            String pattern6 = "([äÄöÖüÜßa-zA-Z]([\\r?\\n])+[äÄöÖüÜßa-zA-Z])";
 
-            p = Pattern.compile(pattern6);
+            // Satzumbruch
+            String pattern6 = "([äÄöÖüÜßa-zA-Z0-9]([\\r?\\n]+)[äÄöÖüÜßa-zA-Z0-9])";
+
+            p = Pattern.compile(pattern6, Pattern.MULTILINE | Pattern.CANON_EQ);
             m = p.matcher(content);
 
             while(m.find()) {
 
                 String original = m.group(1);
-                String neu = original.replace(original.charAt(original.length() - 2), ' ');
-                neu = neu.replaceAll("\\n", "");
-                neu = neu.replaceAll("\\r", "");
+                String neu = original.replaceAll(m.group(2), " "  ) ;
 
                 content = content.replace(original, neu);
 
-                System.out.println("Satzumbruch: "+ original);
-                System.out.println("SatzumbruchNeu: "+ neu);
             }
+
 
             FileOutputStream fos = new FileOutputStream(outFile);
             IOUtils.write(content, fos , "UTF-8");
