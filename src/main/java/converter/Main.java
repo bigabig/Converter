@@ -129,10 +129,10 @@ public class Main {
                 String zeilenende = "\\s"+original+"\n";
                 String zeilenendeReplace = " "+ replacement + " ";
 
-                String komma = "\\s"+original+",";
+                String komma = "\\s"+original+"\\,";
                 String kommaReplace = " "+ replacement + ",";
 
-                String semikolon = "\\s"+original+";";
+                String semikolon = "\\s"+original+"\\;";
                 String semikolonReplace = " "+ replacement + ";";
 
 
