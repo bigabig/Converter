@@ -129,12 +129,20 @@ public class Main {
                 String zeilenende = "\\s"+original+"\n";
                 String zeilenendeReplace = " "+ replacement + " ";
 
+                String komma = "\\s"+original+",";
+                String kommaReplace = " "+ replacement + ",";
+
+                String semikolon = "\\s"+original+";";
+                String semikolonReplace = " "+ replacement + ";";
+
 
                 content = content.replaceAll(zeilenanfang, zeilenanfangReplace);
                 content = content.replaceAll(leerzeichen,leerzeichenReplace );
                 content = content.replaceAll(klammern, klammernReplace);
                 content = content.replaceAll(klammern2,klammern2Replace );
                 content = content.replaceAll(zeilenende,zeilenendeReplace );
+                content = content.replaceAll(komma,kommaReplace );
+                content = content.replaceAll(semikolon,semikolonReplace );
             }
 
 
